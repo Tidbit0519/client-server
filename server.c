@@ -11,34 +11,35 @@
 #define SA struct sockaddr 
    
 // Function designed for chat between client and server. 
-void func(int connfd) 
-{ 
-    char buff[MAX]; 
-    int n; 
-    // infinite loop for chat 
-    for (;;) { 
-        bzero(buff, MAX); 
-   
-        // read the message from client and copy it in buffer 
-        read(connfd, buff, sizeof(buff)); 
-        // print buffer which contains the client contents 
-        printf("From client: %s\t To client : ", buff); 
-        bzero(buff, MAX); 
-        n = 0; 
-        // copy server message in the buffer 
-        while ((buff[n++] = getchar()) != '\n') 
-            ; 
-   
-        // and send that buffer to client 
-        write(connfd, buff, sizeof(buff)); 
-   
-        // if msg contains "Exit" then server exit and chat ended. 
-        if (strncmp("exit", buff, 4) == 0) { 
-            printf("Server Exit...\n"); 
-            break; 
-        } 
-    } 
-} 
+void func(int connfd) {
+    char buff[MAX];
+    int n;
+
+    for (;;) {
+        bzero(buff, MAX);
+
+        // Read the file name sent by the client
+        read(connfd, buff, sizeof(buff));
+        
+        // Remove newline character if present at the end
+        buff[strcspn(buff, "\n")] = '\0';
+
+        // Check if the received message ends with the flag symbol '$'
+        if (buff[strlen(buff) - 1] == '$') {
+            // Removing the flag symbol '$' from the file name
+            buff[strlen(buff) - 1] = '\0';
+        }
+
+        // If the received message contains "exit", server exits and chat ends
+        if (strncmp("exit", buff, 4) == 0) {
+            printf("Server Exit...\n");
+            break;
+        }
+
+        printf("Received file name from client: %s\n", buff);
+    }
+}
+
    
 // Driver function 
 int main() 
